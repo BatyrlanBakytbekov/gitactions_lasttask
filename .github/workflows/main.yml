@@ -1,7 +1,7 @@
 name: CI/CD Pipeline for AWS ElasticBeanstalk
 env:
     EB_PACKAGE_S3_BUCKET_NAME: "bucketbatyrlan"
-    EB_APPLICATION_NAME: "ElasticB-Batyrlan-env"
+    EB_APPLICATION_NAME: "ElasticB-Batyrlan"
     EB_ENVIRONMENT_NAME: "ElasticB-Batyrlan-env"
     DEPLOY_PACKAGE_NAME: "php_Batyrlan_${{ github.sha }}.zip"
     AWS_REGION_NAME: "eu-central-1"
