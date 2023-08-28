@@ -1,8 +1,8 @@
 name: CI/CD Pipeline for AWS ElasticBeanstalk
 env:
-    EB_PACKAGE_S3_BUCKET_NAME: ""
-    EB_APPLICATION_NAME: ""
-    EB_ENVIRONMENT_NAME: "-env"
+    EB_PACKAGE_S3_BUCKET_NAME: "bucketbatyrlan"
+    EB_APPLICATION_NAME: "ElasticB-Batyrlan-env"
+    EB_ENVIRONMENT_NAME: "ElasticB-Batyrlan-env"
     DEPLOYMENT_PACKAGE_NAME: "php_Batyrlan_${{ github.sha }}.zip"
     AWS_REGION_NAME: "eu-central-1"
 
@@ -26,56 +26,38 @@ jobs:
             - name: Configure AWS Credentials
               uses: aws-actions/configure-aws-credentials@v3
               with:
-                aws-access-key-id: ${{  }}
-                aws-secret-access-key: ${{  }}
+                aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+                aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
                 aws-region: ${{ env.AWS_REGION_NANE}}
 
-            - name: Copy to S3
+            - name: Copy Deployment package to S3 bucket
               run: aws s3 cp ${{ env.DEPLOY_PACKAGE_NAME }} S3://${{ env.DB_PACKAGE_S3_BUCKET_NAME}}/
 
             - name: Print to MSG
-              run: echo "CI part is done"
+              run: echo "CI Pipeline part is done"
 
     cd-part:
         runs-on: ubuntu-latest
         needs: ci-part
         steps:
             - name: Configure AWS Credentials
-              uses: aws-actions/configure-aws-credentials@v3
-
-
+              uses: aws-actions/configure-aws-credentials@v2
               with:
-
-                aws-access-key-id: ${{  }}
-
-                aws-secret-access-key: ${{  }}
-
-                aws-region: ${{ env.AWS_REGION_NAME }}
+                aws-access-key-id     : ${{ secrets.AWS_ACCESS_KEY }}
+                aws-secret-access-key : ${{ secrets.AWS_SECRET_KEY }}
+                aws-region            : ${{ env.AWS_REGION_NAME }}
 
  
-
             - name: Create new App
-
               run: |
-
                 aws elasticbeanstalk create-application-version \
-
                 --application-name ${{ env.EB_APPLICATION_NAME }} \
-
-                --source-bundle S3Bucket="${{ env.EB_PACKAGE_S3_BUCKET_NAME }}", S3Key="${{ env.DEPLOY_PACKAGE_NAME }}" \
-
+                --source-bundle S3Bucket="${{ env.EB_PACKAGE_S3_BUCKET_NAME }}",S3Key="${{ env.DEPLOY_PACKAGE_NAME }}" \
                 --version-label "Version-${{ github.sha }}" \
-
                 --description "CommitSHA-${{ github.sha }}"
 
- 
-
             - name: Deploy new App
-
               run: aws elasticbeanstalk update-environment --environment-name ${{ env.EB_ENVIRONMENT_NAME }} --version-label "Version-${{ github.sha }}"
 
- 
-
             - name: Print MSG
-
-              run: echo "Great job! Workflow done"
+              run: echo "CD Pipeline part done"
